@@ -32,6 +32,8 @@ namespace WebAPI
             services.AddSwaggerGen();
             services.AddDbContext<UsersContext>(opt =>
               opt.UseInMemoryDatabase("Library"));
+            services.AddDbContext<BooksContext>(opt =>
+            opt.UseInMemoryDatabase("Library"));
             services.AddControllers();
         }
 

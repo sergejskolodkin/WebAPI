@@ -41,8 +41,8 @@ namespace WebAPI.Controllers
 
 
         // GET api/<UsersController>/5
-        [HttpGet("{Name}, {Patronymic}, {Surname}")]
-        public async Task<ActionResult<UsersDto>> Get(string Name, string Patronymic, string Surname)
+        [HttpGet("{Name}")]
+        public async Task<ActionResult<UsersDto>> Get(string Name)
         {
             var user = await db.Users.FirstOrDefaultAsync(x => x.Name == Name);
             if (user==null)
@@ -70,17 +70,20 @@ namespace WebAPI.Controllers
       
 
         // DELETE api/<UsersController>/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<UsersDto>> Delete(int id)
+        [HttpDelete("{Name},{Patronymic},{Surname}")]
+        public async Task<ActionResult<UsersDto>> Delete(string Name, string Patronymic, string Surname)
         {
-            var user = db.Users.FirstOrDefault(x => x.Id == id);
+            var user = db.Users.FirstOrDefault(x => x.Name == Name && x.Patronymic == Patronymic && x.Surname == Surname);
+
             if (user == null)
             {
                 return NotFound();
             }
+
             db.Users.Remove(user);
             await db.SaveChangesAsync();
-            return Ok(user);
+
+            return Ok(db.Users); 
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,17 +17,30 @@ namespace WebAPI.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
-        private static List<BooksDto> _books = new List<BooksDto>()
+        BooksContext db;
+        public BooksController(BooksContext context)
         {
-           new BooksDto { AuthorName = "Пушкин А.С", Genre = "Роман", TitleBook = "Капитанская Дочка" },
-           new BooksDto { AuthorName = "Есенин С.А", Genre = "Сказка", TitleBook = "Тетя Мотя" },
-           new BooksDto { AuthorName = "Жуковский В.А", Genre = "Баллада", TitleBook = "Людмила" }
-        };
+            db = context;
+            if (!db.Books.Any())
+            {
+                db.Books.Add(new BooksDto { AuthorName = "Пушкин А.С", Genre = "Роман", TitleBook = "Капитанская Дочка" });
+                db.Books.Add(new BooksDto { AuthorName = "Есенин С.А", Genre = "Сказка", TitleBook = "Тетя Мотя" });
+                db.Books.Add(new BooksDto { AuthorName = "Жуковский В.А", Genre = "Баллада", TitleBook = "Людмила" });
+                db.SaveChanges();
+            }
+        }
         // GET: api/<BooksControllers>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BooksDto>>> GetTodoItems() 
+ 
+        public async Task<ActionResult<IEnumerable<BooksDto>>> Get()
         {
-            return _books;
+            var books = await db.Books.ToListAsync();
+            if (books.Count == 0)
+            {
+                return NotFound();
+            }
+            return books;
+
         }
 
         // GET api/<BooksControllers>/5

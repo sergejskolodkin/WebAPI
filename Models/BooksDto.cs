@@ -7,6 +7,7 @@ namespace WebAPI.Models
 {
     public class BooksDto
     {
+        public int Id { get; set; }
         public string TitleBook { get; set; }
         public string AuthorName { get; set; }
         public string Genre { get; set; }
