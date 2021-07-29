@@ -8,7 +8,7 @@ namespace WebAPI.Models
 {
     public class UsersContext:DbContext
     {
-        public DbSet<UsersDto> Users { get; set; }
+        public DbSet<Users> Users { get; set; }
         public UsersContext(DbContextOptions<UsersContext> options)
             : base(options)
         {

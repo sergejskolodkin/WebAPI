@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -15,14 +16,16 @@ namespace WebAPI.Controllers
     public class UsersController : ControllerBase
     {
         UsersContext db;
-        public UsersController(UsersContext context)
+        private readonly IMapper _mapper;
+        public UsersController(UsersContext context, IMapper mapper)
         {
             db = context;
+            _mapper = mapper;
             if (!db.Users.Any())
             {
-                db.Users.Add(new UsersDto { Name = "Иван", Patronymic = "Иванович", Surname = "Иванов", BirthDate = new DateTime(2000, 3, 6) });
-                db.Users.Add(new UsersDto { Name = "Сергей", Patronymic = "Сергеевич", Surname = "Сергеев", BirthDate = new DateTime(2001, 4, 7) });
-                db.Users.Add(new UsersDto { Name = "Вадим", Patronymic = "Вадимович", Surname = "Вадимов", BirthDate = new DateTime(2002, 5, 8) });
+                db.Users.Add(new Users { Name = "Иван", Patronymic = "Иванович", Surname = "Иванов", BirthDate = new DateTime(2000, 3, 6) });
+                db.Users.Add(new Users { Name = "Сергей", Patronymic = "Сергеевич", Surname = "Сергеев", BirthDate = new DateTime(2001, 4, 7) });
+                db.Users.Add(new Users { Name = "Вадим", Patronymic = "Вадимович", Surname = "Вадимов", BirthDate = new DateTime(2002, 5, 8) });
                 db.SaveChanges();
             }
         }
@@ -35,7 +38,7 @@ namespace WebAPI.Controllers
             {
                 return NotFound();
             }
-            return users;
+            return Ok(_mapper.Map<IEnumerable<UsersDto>>(users)); ;
           
         }
 
@@ -49,31 +52,50 @@ namespace WebAPI.Controllers
             {
                 return NotFound();
             }
-            return user;
+            return Ok(_mapper.Map<UsersDto>(user));
         }
 
+
+        //[HttpPost]
+        //public async Task<ActionResult<Books>> Post(BooksDto bookDto)
+        //{
+        //    var booksModel = _mapper.Map<Books>(bookDto);
+        //    if (booksModel == null)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    db.Books.Add(booksModel);
+        //    await db.SaveChangesAsync();
+        //    return Ok(db.Books);
+        //}
+
+
+        
         // POST api/<UsersController>
         [HttpPost]
-        public async Task<ActionResult<UsersDto>> Post(UsersDto user )
+        public async Task<ActionResult<Users>> Post(UsersDto userDto )
         {
-            var users = db.Users;
-            if (user == null)
+            var usersModel = _mapper.Map<Users>(userDto);
+            if (usersModel == null)
             {
                 return BadRequest();
             }
 
-            users.Add(user);
+            db.Users.Add(usersModel);
             await db.SaveChangesAsync();
-            return Ok(users);
+            return Ok(db.Users);
         }
 
-      
+
 
         // DELETE api/<UsersController>/5
         [HttpDelete("{Name},{Patronymic},{Surname}")]
-        public async Task<ActionResult<UsersDto>> Delete(string Name, string Patronymic, string Surname)
+        public async Task<ActionResult<Users>> Delete(string Name, string Patronymic, string Surname)
         {
+            
             var user = db.Users.FirstOrDefault(x => x.Name == Name && x.Patronymic == Patronymic && x.Surname == Surname);
+          
 
             if (user == null)
             {

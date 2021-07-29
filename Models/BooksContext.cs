@@ -8,7 +8,7 @@ namespace WebAPI.Models
 {
     public class BooksContext : DbContext
     {
-        public DbSet<BooksDto> Books { get; set; }
+        public DbSet<Books> Books { get; set; }
         public BooksContext(DbContextOptions<BooksContext> options)
             : base(options)
         {
